@@ -10,56 +10,94 @@ using System.Windows.Forms;
 
 namespace GetData
 {
+
+
+
     public partial class FormMain : Form
     {
+        private List<TextBox> dataTextBoxes;
+        private int step = 0;
+
         public FormMain()
         {
+
             InitializeComponent();
+
+
+            dataTextBoxes = tableLayoutPanelData.Controls.OfType<TextBox>().ToList();
+            dataTextBoxes.Reverse();
+
+            dataTextBoxes[0].Select();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+
+
+        private void FormMain_Load(object sender, EventArgs e)
         {
 
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void buttonBack_Click(object sender, EventArgs e)
         {
+            --step;
 
-        }
+            if (step < 1)
+            {
+                buttonBack.Enabled = false;
 
-        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
-        {
+            }
 
-        }
+            buttonNext.Enabled = true;
+            buttonNext.Text = "Next > ";
 
-        private void button1_Click_1(object sender, EventArgs e)
-        {
 
+            dataTextBoxes[step + 1].Enabled = false;
+            dataTextBoxes[step].Enabled = true;
+            dataTextBoxes[step].Select();
         }
 
         private void buttonNext_Click(object sender, EventArgs e)
         {
 
+            ++step;
+
+            if (step > dataTextBoxes.Count - 2)
+            {
+                // TODO message box
+                buttonNext.Text = "Result";
+
+            }
+            if (step > dataTextBoxes.Count - 1)
+            {
+                --step;
+                try
+                {
+                    Result result = new Result(dataTextBoxes);
+                    result.Show();
+                }
+                catch (System.FormatException ex)
+                {
+                    Console.Write("ERROR: " + ex.Message);
+                    System.Environment.Exit(1);
+                }
+
+            }
+            else
+            {
+                buttonBack.Enabled = true;
+
+                dataTextBoxes[step - 1].Enabled = false;
+                dataTextBoxes[step].Enabled = true;
+                dataTextBoxes[step].Select();
+            }
         }
 
-        private void label2_Click(object sender, EventArgs e)
+        private void dataTextBox_KeyDown(object sender, KeyEventArgs e)
         {
-
-        }
-
-        private void labelName_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label3_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void FormMain_Load(object sender, EventArgs e)
-        {
-
+            if (e.KeyCode == Keys.Enter)
+            {
+                buttonNext_Click(sender, e);
+            }
         }
     }
 }
